@@ -3,7 +3,7 @@
 import React from "react";
 import { useMetaMask } from "@/contexts/MetaMaskContext";
 import { shortenAddress } from "@/utils/ethers";
-import { ChevronDown, Wallet, LogOut } from "lucide-react";
+import { ChevronDown, Wallet, LogOut, Copy, Check } from "lucide-react";
 
 export default function WalletSelector() {
   const {
@@ -18,6 +18,14 @@ export default function WalletSelector() {
   } = useMetaMask();
 
   const [isOpen, setIsOpen] = React.useState(false);
+  const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
+
+  const copyAddress = (address: string, index: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(address);
+    setCopiedIndex(index);
+    setTimeout(() => setCopiedIndex(null), 1500);
+  };
 
   if (!isConnected) {
     return (
@@ -93,6 +101,17 @@ export default function WalletSelector() {
                       {shortenAddress(w.address)}
                     </p>
                   </div>
+                  <button
+                    onClick={(e) => copyAddress(w.address, i, e)}
+                    className="rounded p-1 text-zinc-400 transition-colors hover:bg-zinc-200 hover:text-zinc-700 dark:hover:bg-zinc-600 dark:hover:text-zinc-200"
+                    title="Copy address"
+                  >
+                    {copiedIndex === i ? (
+                      <Check size={14} className="text-green-500" />
+                    ) : (
+                      <Copy size={14} />
+                    )}
+                  </button>
                   {i === walletIndex && (
                     <span className="text-xs text-blue-600 dark:text-blue-400">
                       Active
